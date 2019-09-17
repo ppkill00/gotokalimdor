@@ -1,0 +1,4 @@
+pyautogui==0.9.47
+schedule==0.6.0
+requests==2.21
+pillow==6.1.0
