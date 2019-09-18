@@ -5,6 +5,8 @@ from PIL import ImageStat
 import sys
 import time
  
+
+def imgDiffv1(source, template)
 source = Image.open("source6.png")
 sx, sy = source.size
 target = Image.open("ingame_template.png")

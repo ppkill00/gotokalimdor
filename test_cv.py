@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-img = cv2.imread('source3.png',0)
+img = cv2.imread('source4.png',0)
 img2 = img.copy()
-template = cv2.imread('target7.png',0)
+template = cv2.imread('ingame_template.png',0)
 w, h = template.shape[::-1]
-print("%d %d" %(w,h))
+# print("%d %d" %(w,h))
 # All the 6 methods for comparison in a list
 methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
             'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
@@ -14,10 +14,12 @@ methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
 for meth in methods:
     img = img2.copy()
     method = eval(meth)
+    print(meth)
 
     # Apply template Matching
     res = cv2.matchTemplate(img,template,method)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    print(cv2.minMaxLoc(res))
 
     # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
     if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
@@ -27,10 +29,10 @@ for meth in methods:
     bottom_right = (top_left[0] + w, top_left[1] + h)
     print("top_left : " + str(top_left))
     print("bottom_right : " + str(bottom_right))
-    print("center : %d, %d" %((bottom_right[0] - top_left[0])/2+top_left[0], bottom_right[1]-(bottom_right[1] - top_left[1])/2))
+    print("center point: %d, %d" %((bottom_right[0] - top_left[0])/2+top_left[0], bottom_right[1]-(bottom_right[1] - top_left[1])/2))
 
 
-    cv2.rectangle(img,top_left, bottom_right, 255, 2)
+    cv2.rectangle(img,top_left, bottom_right, 255, 3)
 
     plt.subplot(121),plt.imshow(res,cmap = 'gray')
     plt.title('Matching Result'), plt.xticks([]), plt.yticks([])
