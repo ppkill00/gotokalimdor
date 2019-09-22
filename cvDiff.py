@@ -27,8 +27,8 @@ def cvdiffv1(screen, template, method):
     else:
         top_left = max_loc
     bottom_right = (top_left[0] + w, top_left[1] + h)
-    print("top_left : " + str(top_left))
-    print("bottom_right : " + str(bottom_right))
+    # print("top_left : " + str(top_left))
+    # print("bottom_right : " + str(bottom_right))
     point = ((bottom_right[0] - top_left[0])/2+top_left[0], bottom_right[1]-(bottom_right[1] - top_left[1])/2)
-    print("center point: " + str(point))
+    # print("Center point: " + str(point))
     return point
