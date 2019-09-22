@@ -138,5 +138,5 @@ html/*.html
 images/
 
 #test_file
-#test_*
+test_*
 source*.png
