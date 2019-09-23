@@ -89,7 +89,7 @@ def amIwait():
 
 def checkIngame():
     print("check In game")
-    captureFull("게임 시작, 접속하기")
+    captureFull("게임 화면 상태 모니터링")
     # point = (0,636,1365,767)
     point = (104,608,290,767)
     path = captureRectangle(point,None)
@@ -135,8 +135,9 @@ def exitWow():
 #17. 7번으로 이동.
 
 
-# schedule.every(10).minutes.do(checkIngame)
-schedule.every(10).seconds.do(checkIngame)
+schedule.every(10).minutes.do(checkIngame)
+# schedule.every(10).seconds.do(checkIngame)
+
 
 
 signal.signal(signal.SIGINT, sigint_handler)  #ctrl-c 예외 처리.

@@ -3,7 +3,7 @@ import time
 from slackbot import sendImgtoSlack
 
 def captureFull(title):
-    now = time.strftime('%y%m%d%H%M')
+    now = time.strftime('%y%m%d%H')
     img=ImageGrab.grab()
     saveas="./images/"+"{}{}".format(now,'.png')
     img.save(saveas)
