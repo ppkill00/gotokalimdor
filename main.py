@@ -4,19 +4,10 @@ from capture import captureFull, captureRectangle
 from inputControl import mouseClick, mouseRclick
 from imgDiff import imgDiffv1
 from slackbot import sendTexttoSlack, sendImgtoSlack
+import platform
 
 #del
 import pyautogui as pag
-
-
-icon_template = './imageTemplates/icon_template.png'
-launch_template = './imageTemplates/launch_template.png'
-selserver_template = './imageTemplates/selserver_template.png'
-# selserver_template = './imageTemplates/selserver_template_t.png'
-connect_template = './imageTemplates/connect_template.png'
-ingame_template = './imageTemplates/ingame_template.png'
-wow_template = './imageTemplates/wow_template.png'
-path = './images/1909222008_r.png'
 
 
 def sigint_handler(signum, frame):
@@ -38,7 +29,49 @@ def sigint_handler(signum, frame):
 # 클라이언트 실행 기능 
 
 
+
+
+if platform.system() != 'Windows':
+    #맥북이다.
+    icon_template = './imageTemplates/icon_template.png'
+    launch_template = './imageTemplates/launch_template.png'
+    selserver_template = './imageTemplates/selserver_template.png'
+    # selserver_template = './imageTemplates/selserver_template_t.png'
+    connect_template = './imageTemplates/connect_template.png'
+    ingame_template = './imageTemplates/ingame_template.png'
+    wow_template = './imageTemplates/wow_template.png'
+else:
+    #윈도우다. 
+    icon_template = './imageTemplates/icon_template_w.png'
+    launch_template = './imageTemplates/launch_template_w.png'
+    selserver_template = './imageTemplates/selserver_template_w.png'
+    connect_template = './imageTemplates/connect_template_w.png'
+    ingame_template = './imageTemplates/ingame_template_w.png'
+    wow_template = './imageTemplates/wow_template_w.png'
+
+
 def connectWow():
+    path = captureFull("최초접속")
+    point = cvdiffv1(path, icon_template,'cv2.TM_SQDIFF')
+    mouseClick(point)
+    #실행을 위한 대기
+    time.sleep(1)
+    #4. 화면전체 캡쳐
+    path = captureFull("게임실행")
+    point = cvdiffv1(path, launch_template,'cv2.TM_SQDIFF')
+    mouseClick(point)
+    time.sleep(15)
+    # 와우 클라이언트 접속 기능.
+    #7. (512,216) (로그홀라) 커서 이동(테스트용 531,231) 
+    path = captureFull("서버 선택 및 접속")
+    point = cvdiffv1(path, selserver_template,'cv2.TM_SQDIFF')
+    mouseClick(point)
+    sendTexttoSlack('와우 초기화 및 접속 단계 완료')
+    amIwait()
+
+
+
+def connectWow_win():
     path = captureFull("최초접속")
     point = cvdiffv1(path, icon_template,'cv2.TM_SQDIFF')
     mouseClick(point)
@@ -58,6 +91,7 @@ def connectWow():
     amIwait()
     
 
+
 #==========1단계 종료==========
 
 # 판단로직 시작. 스케쥴이용 필요. 
@@ -68,7 +102,7 @@ def connectWow():
 #11. 접속하기버튼(687,650) 모니터링이 된다면
 
 def amIwait():
-    print("am I wait")
+    print("접속 대기를 수행합니다.")
     time.sleep(5)
     captureFull("대기 화면 또는 케릭터 선택화면")
     point =(500,588,770,767)
@@ -76,29 +110,31 @@ def amIwait():
         path = captureRectangle(point,None)
         if imgDiffv1(path,connect_template): ##원 사이즈랑 차이가 나면 이슈
             #connect phase
-            fpath = captureFull("게임 시작, 접속하기")
+            fpath = captureFull(None)
             point = cvdiffv1(fpath, connect_template,'cv2.TM_SQDIFF')
             mouseClick(point)
             time.sleep(10)
-            sendTexttoSlack('대기상태 종료')
+            sendTexttoSlack('게임접속!')
+            captureFull("게임접속!")
             break
         else:
             time.sleep(5)
-            print('not ingame')
-    print("exit amIwait")
+            print('접속 대기 중')
+
+    print("게임 접속 성공")
 
 def checkIngame():
-    print("check In game")
+    print("게임 진행 중인지 확인 중")
     captureFull("게임 화면 상태 모니터링")
     # point = (0,636,1365,767)
     point = (104,608,290,767)
     path = captureRectangle(point,None)
     if imgDiffv1(path,ingame_template):
-        print("ingame")        
+        print("게임화면 확인..")        
 
     else:
         # need wait...
-        print('not ingame')
+        print('세션타임아웃 확인..게임화면에서 벗어남.')
         
         exitWow()
         time.sleep(5)
@@ -135,7 +171,7 @@ def exitWow():
 #17. 7번으로 이동.
 
 
-schedule.every(10).minutes.do(checkIngame)
+schedule.every(8).minutes.do(checkIngame)
 # schedule.every(10).seconds.do(checkIngame)
 
 
@@ -144,7 +180,11 @@ signal.signal(signal.SIGINT, sigint_handler)  #ctrl-c 예외 처리.
 
 
 if __name__ == '__main__':
-    connectWow() #최초 로그인 부터 시작.
+    if platform.system() != 'Windows':
+        connectWow() #최초 로그인 부터 시작.
+    else:
+        connectWow_win()
     while True:
         schedule.run_pending()
+        time.sleep(1)
 
