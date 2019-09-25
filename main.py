@@ -42,6 +42,7 @@ if platform.system() != 'Windows':
     wow_template = './imageTemplates/wow_template.png'
 else:
     #윈도우다. 
+    print("windows!!")
     icon_template = './imageTemplates/icon_template_w.png'
     launch_template = './imageTemplates/launch_template_w.png'
     selserver_template = './imageTemplates/selserver_template_w.png'
@@ -81,14 +82,19 @@ def connectWow_win():
     path = captureFull("게임실행")
     point = cvdiffv1(path, launch_template,'cv2.TM_SQDIFF')
     mouseClick(point)
+    time.sleep(2)# mr ha option
+    pag.press('enter')
     time.sleep(15)
     # 와우 클라이언트 접속 기능.
     #7. (512,216) (로그홀라) 커서 이동(테스트용 531,231) 
     path = captureFull("서버 선택 및 접속")
     point = cvdiffv1(path, selserver_template,'cv2.TM_SQDIFF')
     mouseClick(point)
+    mouseClick(point)
+    mouseClick(point)
+
     sendTexttoSlack('와우 초기화 및 접속 단계 완료')
-    amIwait()
+    amIwait_w()
     
 
 
@@ -122,6 +128,29 @@ def amIwait():
             print('접속 대기 중')
 
     print("게임 접속 성공")
+
+
+def amIwait_w():
+    print("접속 대기를 수행합니다.")
+    time.sleep(5)
+    captureFull("대기 화면 또는 케릭터 선택화면")
+    while True:
+        path = captureFull(None)
+        if imgDiffv1(path,connect_template): ##원 사이즈랑 차이가 나면 이슈
+            #connect phase
+            point = cvdiffv1(path, connect_template,'cv2.TM_SQDIFF')
+            mouseClick(point)
+            time.sleep(10)
+            sendTexttoSlack('게임접속!')
+            captureFull("게임접속!")
+            break
+        else:
+            time.sleep(5)
+            print('접속 대기 중')
+
+    print("게임 접속 성공")
+
+
 
 def checkIngame():
     print("게임 진행 중인지 확인 중")
@@ -171,7 +200,11 @@ def exitWow():
 #17. 7번으로 이동.
 
 
-schedule.every(8).minutes.do(checkIngame)
+if platform.system() != 'Windows':
+    schedule.every(8).minutes.do(checkIngame)
+else:
+    schedule.every(14).minutes.do(exitWow)
+
 # schedule.every(10).seconds.do(checkIngame)
 
 
@@ -184,6 +217,7 @@ if __name__ == '__main__':
         connectWow() #최초 로그인 부터 시작.
     else:
         connectWow_win()
+    
     while True:
         schedule.run_pending()
         time.sleep(1)
